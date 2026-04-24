@@ -19,7 +19,8 @@ Every skill folder is independently installable — directories like [`aiagentsd
 | Skill | Purpose |
 |-------|---------|
 | [`aviation-regulations`](./skills/aviation-regulations) | Query aviation regulations, manuals, and publications via [deepskyai.com](https://deepskyai.com)'s open search API (ICAO, FAA 14 CFR, EASA, CASA). No API key required. |
-| [`flight-ops-calculators`](./skills/flight-ops-calculators) | Pilot calculators — flexible climb/descent **gradient solver** (any 3 of distance/time/GS/altitude/ROC/angle/gradient → solves the rest) and **Jet A-1 fuel uplift reconciliation** (kg↔lbs↔L↔USG with SG + temp correction, flags >3% discrepancies). |
+| [`flight-ops-calculators`](./skills/flight-ops-calculators) | Ten offline pilot calculators — gradient solver, Jet A-1 fuel uplift (3% rule), wind components, PA/DA, CAS/TAS/Mach, PET/PSR, TOD, W&B, ETOPS radius, holding entry. 34-test zero-dep suite. |
+| [`approach-briefing`](./skills/approach-briefing) | Generates a structured instrument-approach briefing from a plate (image or PDF). The hosting agent's native vision does the extraction; output includes a strict JSON schema and a pilot-facing briefing card. Optional `scripts/deepsky_brief.py` offloads to a deepsky server endpoint when one is live. |
 
 ## Installing a skill locally
 

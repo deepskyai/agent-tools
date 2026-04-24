@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepskyai.com/schemas/approach-briefing.json",
+  "title": "ApproachBriefing",
+  "description": "Structured extraction from a single instrument-approach plate.",
+  "type": "object",
+  "required": ["airport", "procedure", "source", "minima", "missed_approach"],
+  "properties": {
+    "airport": {
+      "type": "object",
+      "required": ["icao"],
+      "properties": {
+        "icao": { "type": "string", "description": "ICAO identifier, e.g. KSFO" },
+        "name": { "type": ["string", "null"] },
+        "elevation_ft": { "type": ["number", "null"] },
+        "tdze_ft": {
+          "type": ["number", "null"],
+          "description": "Touchdown zone elevation for the specific runway"
+        }
+      }
+    },
+
+    "procedure": {
+      "type": "object",
+      "required": ["title", "runway", "type"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Full procedure name as printed, e.g. 'ILS OR LOC RWY 28R'"
+        },
+        "runway": { "type": "string", "description": "e.g. '28R', '13', 'CIRCLING'" },
+        "type": {
+          "type": "string",
+          "enum": ["ILS", "LOC", "LOC_BC", "LPV", "LNAV_VNAV", "LNAV", "RNAV_GPS",
+                   "RNP_AR", "VOR", "VOR_DME", "NDB", "TACAN", "GLS", "PAR", "ASR"]
+        },
+        "category": {
+          "type": ["string", "null"],
+          "enum": ["CAT_I", "CAT_II", "CAT_III", null],
+          "description": "ILS/LOC category if applicable"
+        },
+        "straight_in": { "type": "boolean" },
+        "circling_only": { "type": "boolean" }
+      }
+    },
+
+    "source": {
+      "type": "object",
+      "properties": {
+        "publisher": {
+          "type": ["string", "null"],
+          "enum": ["FAA", "Jeppesen", "AIP", "NavCanada", "UK_AIP", "EuroControl", null]
+        },
+        "effective_date": { "type": ["string", "null"], "format": "date" },
+        "amendment": { "type": ["string", "null"] },
+        "airac_cycle": { "type": ["string", "null"], "description": "e.g. '2510'" },
+        "chart_id": { "type": ["string", "null"] }
+      }
+    },
+
+    "frequencies": {
+      "type": "object",
+      "properties": {
+        "approach": { "type": ["string", "null"] },
+        "tower":    { "type": ["string", "null"] },
+        "ground":   { "type": ["string", "null"] },
+        "atis":     { "type": ["string", "null"] },
+        "awos":     { "type": ["string", "null"] },
+        "ctaf":     { "type": ["string", "null"] },
+        "clearance":{ "type": ["string", "null"] },
+        "other": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "navaids": {
+      "type": "array",
+      "description": "NAVAIDs used by the procedure",
+      "items": {
+        "type": "object",
+        "required": ["ident"],
+        "properties": {
+          "ident":     { "type": "string" },
+          "type":      { "type": ["string", "null"],
+                         "enum": ["VOR", "VOR_DME", "VORTAC", "NDB", "LOC", "ILS", "GS",
+                                  "DME", "MARKER", "TACAN", "WAYPOINT", null] },
+          "frequency": { "type": ["string", "null"] },
+          "role":      { "type": ["string", "null"],
+                         "description": "e.g. 'LOC/GS', 'FAF', 'Missed hold' " }
+        }
+      }
+    },
+
+    "final_approach": {
+      "type": "object",
+      "properties": {
+        "inbound_course_deg": { "type": ["number", "null"] },
+        "gs_angle_deg":       { "type": ["number", "null"] },
+        "tch_ft":             { "type": ["number", "null"], "description": "Threshold crossing height" },
+        "faf_identifier":     { "type": ["string", "null"] },
+        "faf_altitude_ft":    { "type": ["number", "null"] },
+        "step_down_fixes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name":     { "type": "string" },
+              "altitude_ft": { "type": ["number", "null"] },
+              "distance_nm": { "type": ["number", "null"] }
+            }
+          }
+        },
+        "required_climb_gradient_ft_per_nm": { "type": ["number", "null"] }
+      }
+    },
+
+    "msa": {
+      "type": "object",
+      "properties": {
+        "reference_fix": { "type": ["string", "null"] },
+        "radius_nm":     { "type": ["number", "null"] },
+        "sectored":      { "type": "boolean" },
+        "sectors": {
+          "type": "array",
+          "description": "Present when sectored=true",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_bearing_deg": { "type": "number" },
+              "to_bearing_deg":   { "type": "number" },
+              "altitude_ft":      { "type": "number" }
+            }
+          }
+        },
+        "single_altitude_ft": {
+          "type": ["number", "null"],
+          "description": "Present when sectored=false"
+        }
+      }
+    },
+
+    "minima": {
+      "type": "array",
+      "description": "One entry per published minima line.",
+      "items": {
+        "type": "object",
+        "required": ["line"],
+        "properties": {
+          "line": {
+            "type": "string",
+            "description": "Label exactly as printed, e.g. 'S-ILS 28R', 'CIRCLING', 'LPV DA', 'LNAV MDA'"
+          },
+          "da_ft":  { "type": ["number", "null"] },
+          "mda_ft": { "type": ["number", "null"] },
+          "hat_ft": { "type": ["number", "null"], "description": "Height above touchdown" },
+          "haa_ft": { "type": ["number", "null"], "description": "Height above airport (for circling)" },
+          "visibility": {
+            "type": "object",
+            "properties": {
+              "cat_a": { "type": ["string", "null"] },
+              "cat_b": { "type": ["string", "null"] },
+              "cat_c": { "type": ["string", "null"] },
+              "cat_d": { "type": ["string", "null"] },
+              "all":   { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+
+    "missed_approach": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": { "type": "string", "description": "Verbatim plate text" },
+        "initial_altitude_ft": { "type": ["number", "null"] },
+        "climbing_turn":       { "type": ["string", "null"],
+                                 "enum": ["LEFT", "RIGHT", "STRAIGHT", null] },
+        "holding": {
+          "type": ["object", "null"],
+          "properties": {
+            "fix":        { "type": "string" },
+            "inbound_course_deg": { "type": ["number", "null"] },
+            "turn":       { "type": "string", "enum": ["LEFT", "RIGHT"] },
+            "leg_time_min": { "type": ["number", "null"] },
+            "leg_dist_nm":  { "type": ["number", "null"] },
+            "max_holding_alt_ft": { "type": ["number", "null"] }
+          }
+        }
+      }
+    },
+
+    "lighting_and_runway": {
+      "type": "object",
+      "properties": {
+        "approach_lighting":   { "type": ["string", "null"],
+                                 "description": "e.g. 'ALSF-2', 'MALSR', 'ODALS'" },
+        "runway_lighting":     { "type": "array", "items": { "type": "string" } },
+        "runway_length_ft":    { "type": ["number", "null"] },
+        "runway_width_ft":     { "type": ["number", "null"] },
+        "runway_surface":      { "type": ["string", "null"] }
+      }
+    },
+
+    "notes": {
+      "type": "array",
+      "description": "Every boxed, asterisked, or chart-note entry verbatim.",
+      "items": { "type": "string" }
+    },
+
+    "cold_temperature_airport": { "type": ["boolean", "null"] },
+    "cold_temp_restriction_c":  { "type": ["number", "null"] },
+    "rnp_values_nm":            { "type": "array", "items": { "type": "number" } },
+
+    "agent_threats": {
+      "type": "array",
+      "description": "Inferred by the agent — NOT extracted. Flag terrain/ops concerns the pilot should know.",
+      "items": { "type": "string" }
+    },
+
+    "extraction_gaps": {
+      "type": "array",
+      "description": "Fields the agent could not read (blurry, cropped, absent).",
+      "items": { "type": "string" }
+    }
+  }
+}
