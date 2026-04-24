@@ -21,9 +21,12 @@ scripts/
 ├── weight_balance.py    W&B + CG + %MAC
 ├── etops.py             EDTO / ETOPS diversion radius
 └── holding.py           direct / parallel / teardrop entry
+tests/
+└── test_all.py          34 zero-dep assertions; `python3 tests/test_all.py`
 ```
 
 See `references/formulas.md` for derivations, constants, and edge cases.
+Run the test suite any time you edit a script: `python3 tests/test_all.py`.
 
 ---
 
