@@ -19,6 +19,7 @@ Every skill folder is independently installable — directories like [`aiagentsd
 | Skill | Purpose |
 |-------|---------|
 | [`aviation-regulations`](./skills/aviation-regulations) | Query aviation regulations, manuals, and publications via [deepskyai.com](https://deepskyai.com)'s open search API (ICAO, FAA 14 CFR, EASA, CASA). No API key required. |
+| [`flight-ops-calculators`](./skills/flight-ops-calculators) | Pilot calculators — flexible climb/descent **gradient solver** (any 3 of distance/time/GS/altitude/ROC/angle/gradient → solves the rest) and **Jet A-1 fuel uplift reconciliation** (kg↔lbs↔L↔USG with SG + temp correction, flags >3% discrepancies). |
 
 ## Installing a skill locally
 
