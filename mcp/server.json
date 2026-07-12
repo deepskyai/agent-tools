@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.deepskyai/aviation-regulations",
   "title": "Deepsky Aviation Regulations",
-  "description": "Free, no-key search over CASA, FAA (14 CFR), EASA and ICAO aviation regulations and manuals. Returns ranked verbatim regulatory text with section citations. Operated by Deepsky, makers of The Compliance Team audit automation platform for aviation operators.",
+  "description": "Free no-key search over CASA, FAA, EASA & ICAO aviation regulations. By Deepsky (deepskyai.com).",
   "version": "1.0.0",
   "websiteUrl": "https://www.deepskyai.com",
   "repository": {
