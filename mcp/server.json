@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.deepskyai/aviation-regulations",
+  "name": "com.deepskyai/aviation-regulations",
   "title": "Deepsky Aviation Regulations",
   "description": "Free no-key search over CASA, FAA, EASA & ICAO aviation regulations. By Deepsky (deepskyai.com).",
   "version": "1.0.0",
