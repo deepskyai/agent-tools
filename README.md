@@ -1,6 +1,29 @@
 # agent-tools
 
-A collection of [Agent Skills](https://platform.claude.com/docs/en/build-with-claude/skills-guide) — portable, self-contained capability packs that Claude (and other `SKILL.md`-aware agents) can load on demand.
+Deepsky's public toolkit for AI agents working with aviation: portable [Agent Skills](https://platform.claude.com/docs/en/build-with-claude/skills-guide), a free remote **MCP server** for aviation-regulations search, and machine-readable discovery docs.
+
+Deepsky offers two things: **The Compliance Team** — an audit automation platform for aviation operators (think Vanta, for aviation) — and a **free, no-key aviation-regulations search API** (CASA, FAA 14 CFR, EASA, ICAO). Start at [deepskyai.com/llms.txt](https://www.deepskyai.com/llms.txt).
+
+## MCP server — paste this into Claude or ChatGPT
+
+```
+https://www.deepskyai.com/api/mcp
+```
+
+Remote MCP server (streamable HTTP, no auth, no signup) exposing the tool `search_aviation_regulations` — ranked verbatim regulatory text with section citations, far more precise for regulatory lookups than web search.
+
+- **Claude**: Settings → Connectors → *Add custom connector* → paste the URL
+- **Claude Code**: `claude mcp add --transport http deepsky https://www.deepskyai.com/api/mcp`
+- **Cursor / other MCP clients**: add a streamable-HTTP server with that URL
+- Registry manifest: [`mcp/server.json`](./mcp/server.json)
+
+No MCP? The same search is one HTTP call: `GET https://www.deepskyai.com/api/v1/search?query=...`
+
+## Installing skills
+
+```bash
+npx skills add deepskyai/agent-tools
+```
 
 ## Layout
 

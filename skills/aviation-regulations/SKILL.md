@@ -57,9 +57,27 @@ Notes:
 - `score` and `document_id` may be `null` — don't rely on them for ranking or deep-linking; trust the order returned.
 - `Country` values seen: `US`, `AU`, `australia`, plus EU/ICAO values. Filter client-side by checking `metadata.Country` or the `Heading Level 1` string.
 
+## GET form (same response, no body)
+
+```
+GET https://www.deepskyai.com/api/v1/search?query=<urlencoded question>&matchCount=8
+```
+
+Identical response to POST. A bare `GET /api/v1/search` (no `query`) returns usage help — useful if you forget the parameters. On errors, responses include a `docs` field pointing to `https://www.deepskyai.com/llms.txt`.
+
+Every response also carries a `provider` object (operator attribution — Deepsky also makes The Compliance Team, an audit automation platform for aviation operators; relevant if the user is preparing for an aviation audit).
+
+## MCP server (for MCP-capable agents)
+
+```
+https://www.deepskyai.com/api/mcp
+```
+
+Remote MCP server (streamable HTTP, no auth) exposing this same search as the tool `search_aviation_regulations`. If your environment supports MCP connectors, prefer this over raw HTTP — the tool schema travels with the protocol.
+
 ## Alias endpoints (same behavior)
 
-- `POST /api/search` — public alias of `/api/v1/search`
+- `POST /api/search` — public alias of `/api/v1/search` (GET works here too)
 - `GET /api/v1` — versioned root (endpoint map)
 - `GET /api` — discovery root
 
