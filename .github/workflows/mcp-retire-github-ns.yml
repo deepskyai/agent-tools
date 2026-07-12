@@ -13,4 +13,4 @@ jobs:
       - name: Login and mark deleted
         run: |
           ./mcp-publisher login github-oidc
-          ./mcp-publisher status --status deleted --message "Republished under com.deepskyai/aviation-regulations" --all-versions io.github.deepskyai/aviation-regulations
+          echo y | ./mcp-publisher status --status deleted --message "Republished under com.deepskyai/aviation-regulations" --all-versions io.github.deepskyai/aviation-regulations
