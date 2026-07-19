@@ -1,6 +1,6 @@
 ---
 name: flight-ops-calculators
-description: Ten pure-offline flight-ops calculators for pilots. (1) gradient — flexible climb/descent solver over {distance, time, GS, altitude, ROC, angle, %-gradient, ft/NM}. (2) fuel_uplift — Jet A-1 kg↔L↔USG↔lbs reconciliation with SG + temperature correction and the industry 3% tolerance rule. (3) wind_components — headwind/crosswind from wind + runway. (4) altitude — pressure altitude, ISA deviation, density altitude. (5) airspeed — CAS↔TAS↔Mach in the ICAO troposphere. (6) pet_psr — Point of Equal Time and Point of Safe Return. (7) descent — 3-to-1 Top-of-Descent with speed/wind/buffer tax. (8) weight_balance — CG + %MAC with limit checking. (9) etops — EDTO/ETOPS diversion-radius given threshold time and OEI TAS. (10) holding — direct/parallel/teardrop entry per FAA AIM 5-3-8. Use whenever a pilot asks about climb/descent geometry, TOD, fuel unit conversion, wind components, pressure/density altitude, true-airspeed conversion, long-range diversion planning, weight & balance, ETOPS diversion radius, or holding-pattern entries. All tools take CLI flags and emit JSON by default, human-readable tables with --pretty.
+description: Ten pure-offline flight-ops calculators for pilots. (1) gradient - flexible climb/descent solver over {distance, time, GS, altitude, ROC, angle, %-gradient, ft/NM}. (2) fuel_uplift - Jet A-1 kg↔L↔USG↔lbs reconciliation with SG + temperature correction and the industry 3% tolerance rule. (3) wind_components - headwind/crosswind from wind + runway. (4) altitude - pressure altitude, ISA deviation, density altitude. (5) airspeed - CAS↔TAS↔Mach in the ICAO troposphere. (6) pet_psr - Point of Equal Time and Point of Safe Return. (7) descent - 3-to-1 Top-of-Descent with speed/wind/buffer tax. (8) weight_balance - CG + %MAC with limit checking. (9) etops - EDTO/ETOPS diversion-radius given threshold time and OEI TAS. (10) holding - direct/parallel/teardrop entry per FAA AIM 5-3-8. Use whenever a pilot asks about climb/descent geometry, TOD, fuel unit conversion, wind components, pressure/density altitude, true-airspeed conversion, long-range diversion planning, weight & balance, ETOPS diversion radius, or holding-pattern entries. All tools take CLI flags and emit JSON by default, human-readable tables with --pretty.
 ---
 
 # Flight Ops Calculators
@@ -22,18 +22,20 @@ scripts/
 ├── etops.py             EDTO / ETOPS diversion radius
 └── holding.py           direct / parallel / teardrop entry
 tests/
-└── test_all.py          34 zero-dep assertions; `python3 tests/test_all.py`
+├── test_all.py                  34 zero-dep tests
+└── test_runway_validation.py    3 runway-validation tests
 ```
 
 See `references/formulas.md` for derivations, constants, and edge cases.
-Run the test suite any time you edit a script: `python3 tests/test_all.py`.
+Run both test files any time you edit a script:
+`python3 tests/test_all.py && python3 tests/test_runway_validation.py`.
 
 ---
 
-## 1. `gradient.py` — climb/descent solver
+## 1. `gradient.py` - climb/descent solver
 
-Eight variables — `distance_nm`, `time_min`, `gs_kt`, `altitude_ft`,
-`rate_fpm`, `angle_deg`, `gradient_pct`, `gradient_ft_per_nm` — and six
+Eight variables - `distance_nm`, `time_min`, `gs_kt`, `altitude_ft`,
+`rate_fpm`, `angle_deg`, `gradient_pct`, `gradient_ft_per_nm` - and six
 relationships. Supply any sufficient subset (typically 3 values), solves for
 the rest. Sign convention: + climb, − descent for altitude, rate, angle, and
 gradient.
@@ -45,14 +47,14 @@ Triggers: "climb gradient", "ROC required", "3-to-1 descent", "TOD distance",
 # Required gradient to clear 1500 ft in 5 NM at 140 kt
 python3 scripts/gradient.py --distance-nm 5 --altitude-ft 1500 --gs-kt 140 --pretty
 
-# 3° descent from FL100 at GS 250 — how far out is TOD, what's the ROD?
+# 3° descent from FL100 at GS 250 - how far out is TOD, what's the ROD?
 python3 scripts/gradient.py --altitude-ft -10000 --angle-deg -3 --gs-kt 250 --pretty
 
 # ROC for 5% gradient at GS 180
 python3 scripts/gradient.py --gradient-pct 5 --gs-kt 180 --pretty
 ```
 
-## 2. `fuel_uplift.py` — Jet A-1 uplift reconciliation
+## 2. `fuel_uplift.py` - Jet A-1 uplift reconciliation
 
 Compares mass ordered vs mass actually delivered (volume × SG × temp
 correction), flags >3% deltas (the Jet A-1 SG-band rule).
@@ -65,7 +67,7 @@ python3 scripts/fuel_uplift.py --expected-mass-kg 12000 --volume-L 15200 \
     --sg-15c 0.794 --fuel-temp-c 22 --pretty
 ```
 
-## 3. `wind_components.py` — headwind / crosswind
+## 3. `wind_components.py` - headwind / crosswind
 
 Inputs: wind direction (°T), wind speed (kt), runway (number like `27`, `09L`
 or a full heading in degrees).
@@ -77,7 +79,7 @@ wind math.
 python3 scripts/wind_components.py --wind-from 210 --wind-kt 18 --runway 27 --pretty
 ```
 
-## 4. `altitude.py` — PA / DA / ISA-dev
+## 4. `altitude.py` - PA / DA / ISA-dev
 
 Inputs: field elevation, altimeter (QNH hPa or inHg), OAT.
 
@@ -88,11 +90,11 @@ deviation", performance-chart entry arguments.
 python3 scripts/altitude.py --elevation-ft 5000 --qnh-hpa 1005 --oat-c 28 --pretty
 ```
 
-## 5. `airspeed.py` — CAS ↔ TAS ↔ Mach
+## 5. `airspeed.py` - CAS ↔ TAS ↔ Mach
 
 Inputs: pressure altitude + (OAT **or** ISA-dev) + any one of CAS, TAS, Mach.
 Subsonic troposphere model; ignores compressibility correction (<1% under
-M 0.5). Don't use for transonic performance work — use the FMS/FCOM.
+M 0.5). Don't use for transonic performance work - use the FMS/FCOM.
 
 Triggers: "convert IAS to TAS", "what Mach is 280 KIAS at FL350", "TAS at
 FL250 ISA+10", flight-plan groundspeed sanity checks.
@@ -102,7 +104,7 @@ python3 scripts/airspeed.py --cas-kt 250 --pa-ft 10000 --pretty
 python3 scripts/airspeed.py --mach 0.78 --pa-ft 37000 --isa-dev 10 --pretty
 ```
 
-## 6. `pet_psr.py` — Point of Equal Time & Point of Safe Return
+## 6. `pet_psr.py` - Point of Equal Time & Point of Safe Return
 
 Inputs: distance (for PET), endurance in hours (for PSR), GS out, GS home.
 Can compute either one, or both in the same call.
@@ -116,10 +118,10 @@ python3 scripts/pet_psr.py --distance-nm 2200 --endurance-hr 5.8 \
     --gs-out 460 --gs-home 420 --pretty
 ```
 
-## 7. `descent.py` — Top-of-Descent planner
+## 7. `descent.py` - Top-of-Descent planner
 
 3-to-1 rule with itemised tax: speed reduction (1 NM per 10 kt), wind
-(1 NM per 10 kt headwind), extra buffer. Rule-of-thumb only — use the FMS
+(1 NM per 10 kt headwind), extra buffer. Rule-of-thumb only - use the FMS
 for precise profiles.
 
 Triggers: "TOD", "when to start down", "3× rule", "descent planning",
@@ -130,7 +132,7 @@ python3 scripts/descent.py --current-alt 37000 --target-alt 2000 \
     --current-speed 290 --target-speed 250 --headwind 20 --pretty
 ```
 
-## 8. `weight_balance.py` — W&B + CG
+## 8. `weight_balance.py` - W&B + CG
 
 Generic. Two input styles:
 
@@ -152,7 +154,7 @@ python3 scripts/weight_balance.py \
     --cg-fwd 18.5 --cg-aft 24.0 --max-weight 62000 --pretty
 ```
 
-## 9. `etops.py` — EDTO/ETOPS diversion radius
+## 9. `etops.py` - EDTO/ETOPS diversion radius
 
 Inputs: authorised threshold time (min), OEI cruise TAS (kt), optional
 headwind component. Outputs still-air and wind-corrected radii.
@@ -164,7 +166,7 @@ dispatch review.
 python3 scripts/etops.py --threshold-min 180 --oei-tas 400 --headwind 35 --pretty
 ```
 
-## 10. `holding.py` — entry type
+## 10. `holding.py` - entry type
 
 Inputs: inbound holding course (°T), aircraft heading at the fix (°T),
 turn direction (default right). Returns direct / parallel / teardrop plus a

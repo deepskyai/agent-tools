@@ -25,12 +25,19 @@ import sys
 
 def parse_runway(token: str) -> float:
     """Accept '27', '09L', '27R', '270', or '273.4' and return degrees."""
-    m = re.match(r"^\s*(\d+(?:\.\d+)?)\s*[LRClrc]?\s*$", token)
+    m = re.match(r"^\s*(\d+(?:\.\d+)?)\s*([LRClrc]?)\s*$", token)
     if not m:
         raise ValueError(f"Unrecognised runway token: {token!r}")
     val = float(m.group(1))
-    if val < 37:
+    suffix = m.group(2)
+    if suffix:
+        if not val.is_integer() or not 1 <= val <= 36:
+            raise ValueError(f"Invalid runway designator: {token!r}")
         val *= 10.0
+    elif val.is_integer() and 1 <= val <= 36:
+        val *= 10.0
+    elif not 0 <= val <= 360:
+        raise ValueError(f"Runway heading must be between 0 and 360: {token!r}")
     return val % 360.0
 
 
@@ -57,11 +64,19 @@ def build_parser() -> argparse.ArgumentParser:
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument("--wind-from", type=float, required=True,
-                   help="Wind direction (°T), i.e. direction wind is coming FROM")
+    p.add_argument(
+        "--wind-from",
+        type=float,
+        required=True,
+        help="Wind direction (°T), i.e. direction wind is coming FROM",
+    )
     p.add_argument("--wind-kt", type=float, required=True, help="Wind speed, knots")
-    p.add_argument("--runway", type=str, required=True,
-                   help="Runway number (e.g. 27, 09L) or full heading (e.g. 273)")
+    p.add_argument(
+        "--runway",
+        type=str,
+        required=True,
+        help="Runway number (e.g. 27, 09L) or full heading (e.g. 273)",
+    )
     p.add_argument("--pretty", action="store_true")
     return p
 
@@ -86,7 +101,9 @@ def main(argv=None) -> int:
     if args.pretty:
         label = "HEADWIND" if head >= 0 else "TAILWIND"
         xdir = "from RIGHT" if cross >= 0 else "from LEFT"
-        print(f"Wind {args.wind_from:.0f}° @ {args.wind_kt:.0f} kt — Runway heading {rwy:.0f}°")
+        print(
+            f"Wind {args.wind_from:.0f}° @ {args.wind_kt:.0f} kt - Runway heading {rwy:.0f}°"
+        )
         print(f"  {label}  {abs(head):.1f} kt")
         print(f"  Crosswind {abs(cross):.1f} kt {xdir}")
         print(f"  Relative wind angle: {rel:+.1f}°")
